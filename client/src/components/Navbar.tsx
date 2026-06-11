@@ -33,6 +33,7 @@ export default function Navbar() {
           <Link to="/" style={{ color: '#555', fontSize: 14 }}>赛事列表</Link>
           {user && (
             <>
+              <Link to="/my-applications" style={{ color: '#555', fontSize: 14 }}>我的报名</Link>
               <Link to="/my-schedule" style={{ color: '#555', fontSize: 14 }}>我的排班</Link>
               <Link to="/checkin" style={{ color: '#555', fontSize: 14 }}>签到打卡</Link>
               <Link to="/notifications" style={{ color: '#555', fontSize: 14 }}>通知</Link>

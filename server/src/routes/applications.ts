@@ -78,6 +78,36 @@ router.get('/event/:eventId', authMiddleware, organizerMiddleware, (req: Request
   }
 });
 
+// Cancel application (volunteer)
+router.delete('/:id', authMiddleware, (req: Request, res: Response) => {
+  try {
+    const { userId } = (req as any).user;
+
+    const application = db.prepare('SELECT * FROM applications WHERE id = ?').get(req.params.id) as any;
+
+    if (!application) {
+      res.status(404).json({ error: '报名记录不存在' });
+      return;
+    }
+
+    if (application.user_id !== userId) {
+      res.status(403).json({ error: '无权取消他人报名' });
+      return;
+    }
+
+    if (application.status !== 'pending') {
+      res.status(400).json({ error: '仅待审核状态的报名可取消' });
+      return;
+    }
+
+    db.prepare('DELETE FROM applications WHERE id = ?').run(req.params.id);
+
+    res.json({ message: '报名已取消' });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Approve/reject application (organizer)
 router.put('/:id/status', authMiddleware, organizerMiddleware, (req: Request, res: Response) => {
   try {

@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import EventDetail from './pages/EventDetail';
 import Apply from './pages/Apply';
+import MyApplications from './pages/MyApplications';
 import MySchedule from './pages/MySchedule';
 import Checkin from './pages/Checkin';
 import Notifications from './pages/Notifications';
@@ -37,6 +38,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <Apply />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-applications"
+          element={
+            <ProtectedRoute>
+              <MyApplications />
             </ProtectedRoute>
           }
         />

@@ -99,6 +99,9 @@ export const api = {
       body: JSON.stringify({ status }),
     }),
 
+  cancelApplication: (id: number) =>
+    request(`/applications/${id}`, { method: 'DELETE' }),
+
   // Schedules
   getMySchedules: () => request('/schedules/my'),
 
