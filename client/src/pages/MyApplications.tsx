@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
+import { useAuth } from '../contexts/AuthContext';
 
 const statusMap: Record<string, { label: string; className: string }> = {
   pending: { label: '待审核', className: 'badge-pending' },
@@ -13,6 +14,7 @@ export default function MyApplications() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const navigate = useNavigate();
+  const { isVolunteer } = useAuth();
 
   useEffect(() => {
     loadApplications();
@@ -116,7 +118,7 @@ export default function MyApplications() {
                     报名时间：{app.created_at}
                   </span>
                   <div>
-                    {app.status === 'pending' && (
+                    {app.status === 'pending' && isVolunteer && (
                       <button
                         className="btn btn-danger btn-sm"
                         onClick={() => handleCancel(app.id)}

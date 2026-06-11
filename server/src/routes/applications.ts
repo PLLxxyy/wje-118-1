@@ -81,7 +81,12 @@ router.get('/event/:eventId', authMiddleware, organizerMiddleware, (req: Request
 // Cancel application (volunteer)
 router.delete('/:id', authMiddleware, (req: Request, res: Response) => {
   try {
-    const { userId } = (req as any).user;
+    const { userId, role } = (req as any).user;
+
+    if (role !== 'volunteer') {
+      res.status(403).json({ error: '仅志愿者可取消报名' });
+      return;
+    }
 
     const application = db.prepare('SELECT * FROM applications WHERE id = ?').get(req.params.id) as any;
 
