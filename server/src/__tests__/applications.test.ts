@@ -1,5 +1,3 @@
-process.env.VOLUNTEER_DB_MEMORY = '1';
-
 import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import bcrypt from 'bcryptjs';
@@ -14,11 +12,6 @@ function generateToken(userId: number, role: string): string {
 }
 
 function seedTestData() {
-  db.prepare('DELETE FROM applications').run();
-  db.prepare('DELETE FROM positions').run();
-  db.prepare('DELETE FROM events').run();
-  db.prepare('DELETE FROM users').run();
-
   const volHash = bcrypt.hashSync('vol123', 10);
   db.prepare(
     'INSERT INTO users (id, username, email, password_hash, role, phone) VALUES (?, ?, ?, ?, ?, ?)'
@@ -40,6 +33,7 @@ function seedTestData() {
 
 describe('取消报名接口（真实路由）', () => {
   beforeAll(() => {
+    expect(process.env.VOLUNTEER_DB_MEMORY).toBe('1');
     seedTestData();
   });
 
