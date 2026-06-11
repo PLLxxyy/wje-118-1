@@ -3,18 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import bcrypt from 'bcryptjs';
 
-const dataDir = path.join(__dirname, '..', 'data');
-if (!fs.existsSync(dataDir)) {
-  fs.mkdirSync(dataDir, { recursive: true });
-}
-
-const dbPath = path.join(dataDir, 'volunteer.db');
-const db = new Database(dbPath);
-
-db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
-
-export function initDatabase(): void {
+export function createTables(db: Database.Database): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -121,11 +110,9 @@ export function initDatabase(): void {
       FOREIGN KEY (user_id) REFERENCES users(id)
     );
   `);
-
-  seedData();
 }
 
-function seedData(): void {
+export function seedDatabase(db: Database.Database): void {
   const adminExists = db.prepare('SELECT id FROM users WHERE username = ?').get('admin');
   if (adminExists) return;
 
@@ -170,6 +157,34 @@ function seedData(): void {
   for (const pos of positions) {
     insertPos.run(1, pos[0], pos[1], pos[2], pos[3], pos[4], pos[5]);
   }
+}
+
+export function createDatabase(filePath?: string): Database.Database {
+  const db = filePath ? new Database(filePath) : new Database(':memory:');
+  db.pragma('journal_mode = WAL');
+  db.pragma('foreign_keys = ON');
+  createTables(db);
+  if (filePath) {
+    seedDatabase(db);
+  }
+  return db;
+}
+
+let db: Database.Database;
+
+if (process.env.VOLUNTEER_DB_MEMORY === '1') {
+  db = createDatabase();
+} else {
+  const dataDir = path.join(__dirname, '..', 'data');
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+  const dbPath = path.join(dataDir, 'volunteer.db');
+  db = createDatabase(dbPath);
+}
+
+export function initDatabase(): void {
+  // keep for backward compatibility; createDatabase already did the work
 }
 
 export default db;
